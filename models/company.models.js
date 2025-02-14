@@ -64,21 +64,19 @@ const companySchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+  uniqueKey:{
+    type:String,
+  }
 });
 
-export const generateAccessToken = async (id) => {
-  const result =  jwt.sign(
-    {
-      id: id,
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRE,
-    }
-  );
-
-  return result;
-};
 
 const Company = mongoose.model("Company", companySchema);
 export default Company;

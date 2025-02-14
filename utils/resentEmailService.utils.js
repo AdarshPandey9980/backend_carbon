@@ -11,7 +11,7 @@ const sendOtp = async (email,name) => {
 
     try {
         const { data, error } = await resend.emails.send({
-            from: "DigiSir <noreply@hellodigisir.in>",
+            from: "Bajaj <noreply@hellodigisir.in>",
             to: [`${email}`],
             subject: "Verification OTP",
             html: OTP_EMAIL_HTML(name,otp),

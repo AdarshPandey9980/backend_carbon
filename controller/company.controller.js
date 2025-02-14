@@ -11,6 +11,12 @@ const registerCompany = async (req,res) => {
         return res.status(400).json({ message: "All fields are required",isSuccess:false });
       }
 
+      const user = await Company.find({email:companyEmail})
+
+      if (user.length > 0) {
+        return res.status(400).json({ message: "Email already exists",isSuccess:false });
+      }
+
       const avatarLocalPath = req.file?.path;
 
       const avatar = await uploadOnCloud(avatarLocalPath);
@@ -34,6 +40,11 @@ const registerCompany = async (req,res) => {
         gstInNumber:hashedGstIn,
         avatar:avatar.url || null,
       });
+
+      const lastFourId = company._id.toString().slice(-4);
+      const uniqueKey = `${name}${lastFourId}`;
+      company.uniqueKey = uniqueKey;
+
 
       await company.save()
 

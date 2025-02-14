@@ -9,7 +9,7 @@ const sendOtpToEmail = async (req, res, next) => {
       return res.status(400).json({ message: "email and name is requied" });
     }
 
-    const {name} = req.body || "digisir"
+    const {name} = req.body || "carbon"
 
     const { otp, data, error } = await sendOtp(email, name);
 
