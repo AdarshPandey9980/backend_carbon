@@ -164,4 +164,30 @@ const loginAdmin = async (req,res) => {
   }
 }
 
-export {registerCompany,loginCompany,getCurrentUser,createAdminForCompany,loginAdmin}
+const updatePassword = async (req,res) => {
+  try {
+    const {password} = req.body
+
+    const userId = req.userId
+
+    if (!password || !userId) {
+      return res.status(404).json({message:"all the field are required",isSuccess:false})
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    const user = await Company.findByIdAndUpdate(userId,{$set:{companyPassword:hashedPassword}})
+
+    if(!user) {
+      return res.status(404).json({message:"user not found",isSuccess:false})
+    }
+
+    return res.status(200).json({message:"password updated successfully",isSuccess:true})
+
+  } catch (error) {
+    return res.status(500).json({message:"something went wrong"})
+  }
+}
+
+export {registerCompany,loginCompany,getCurrentUser,createAdminForCompany,loginAdmin,updatePassword}

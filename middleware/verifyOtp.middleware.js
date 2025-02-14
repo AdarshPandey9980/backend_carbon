@@ -1,5 +1,7 @@
 import { sendOtp } from "../utils/resentEmailService.utils.js";
-// import Student from "../models/student.model.js";
+import NodeCache from "node-cache";
+
+const cache = new NodeCache({ stdTTL: 180, checkperiod: 300 });
 
 const sendOtpToEmail = async (req, res, next) => {
   try {
@@ -17,13 +19,14 @@ const sendOtpToEmail = async (req, res, next) => {
       return res.status(400).json({ message: "failed to send otp",isSuccess:false });
     }
 
+    cache.set("otp", otp);
+
     return res.status(200).json({otp:otp, message: "otp send successfully",isSuccess:true });
   } catch (error) {
     return res.status(500).json({ message: "failed to send otp" });
   }
 };
 
-// const sendOtpToEmailViaAadhar = async (req, res, next) => {
 //   try {
 //     const { aadharCardNumber } = req.body;
 //     console.log(aadharCardNumber);
@@ -56,7 +59,8 @@ const sendOtpToEmail = async (req, res, next) => {
 const verifyOtp = async (req, res) => {
   try {
     const { userotp } = req.body;
-    const { otp } = req.body;
+    // const { otp } = req.body;
+    const otp = cache.get("otp");
     console.log(otp);
     console.log(userotp.toString());
     

@@ -1,6 +1,6 @@
 import express from "express"
 import {upload} from "../middleware/multer.middleware.js"
-import {registerCompany,loginCompany,getCurrentUser,createAdminForCompany,loginAdmin} from "../controller/company.controller.js"
+import {registerCompany,loginCompany,getCurrentUser,createAdminForCompany,loginAdmin,updatePassword} from "../controller/company.controller.js"
 import {verifyJwt} from "../middleware/auth.middleware.js"
 
 const router = express.Router()
@@ -10,5 +10,6 @@ router.route("/login").post(loginCompany)
 router.route("/current-user").get(verifyJwt,getCurrentUser)
 router.route("/add-admin").post(verifyJwt,createAdminForCompany)
 router.route("/login-admin").post(loginAdmin)
+router.route("/update-password").post(verifyJwt,updatePassword)
 
 export default router
