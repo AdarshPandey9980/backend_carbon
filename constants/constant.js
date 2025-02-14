@@ -1,4 +1,4 @@
-export const DB_NAME = "digisir";
+export const DB_NAME = "carbon_emission";
 
 export const OTP_EMAIL_HTML = (name, otp) => `<!DOCTYPE html>
 <html lang="en">
