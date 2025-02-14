@@ -1,5 +1,5 @@
 import Company from "../models/company.models.js";
-import {generateAccessTokens} from "../middleware/auth.middleware.js"
+import {generateAccessToken} from "../middleware/auth.middleware.js"
 import bcrypt from "bcryptjs";
 import uploadOnCloud from "../utils/cloudnary.utils.js"
 import fs from "fs"
@@ -71,7 +71,7 @@ const loginCompany = async (req,res) => {
       return res.status(400).json({ message: "Invalid credentials",isSuccess:false });
     } 
 
-    const token = generateAccessTokens(company._id)
+    const token = generateAccessToken(company._id)
 
     if (!token) {
       return res.status(500).json({message:"something went wrong ",isSuccess:false})
@@ -103,4 +103,65 @@ const getCurrentUser = async (req,res) => {
   }
 }
 
-export {registerCompany,loginCompany,getCurrentUser}
+const createAdminForCompany = async (req,res) => {
+  try {
+    const {name,email,password} = req.body
+    const userId = req.userId
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields are required",isSuccess:false });
+    }
+
+    if (!userId) {
+      return res.status(404).json({message:"company not found ",isSuccess:false})
+    }
+
+    const company = await Company.findById(userId)
+
+    if (!company) {
+      return res.status(404).json({message:"company not found ",isSuccess:false})
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    company.adminsAuth.push({ name, email, password: hashedPassword});
+    await company.save();
+
+    return res.status(200).json({message:"admin created successfully",isSuccess:true})
+
+  } catch (error) {
+    return res.status(500).json({message:"something went wrong"})
+  }
+}
+
+const loginAdmin = async (req,res) => {
+  try {
+    const {key,email,password} = req.body
+
+    if (!key || !email || !password) {
+      return res.status(404).json({message:"all the field are required",isSuccess:false})
+    }
+
+    const company = await Company.findOne({uniqueKey:key})
+
+    const adminUser = company.adminsAuth.find((user) => user.email === email)
+    
+    if (!adminUser) {
+      return res.status(404).json({message:"admin user not found",isSuccess:false})
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password,adminUser.password)
+
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ message: "Invalid credentials",isSuccess:false });
+    }
+
+    return res.status(200).json({message:"admin logged in successfully",isSuccess:true})
+
+  } catch (error) {
+    return res.status(500).json({message:"something went wrong"})
+  }
+}
+
+export {registerCompany,loginCompany,getCurrentUser,createAdminForCompany,loginAdmin}
